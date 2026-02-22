@@ -163,7 +163,8 @@
         Each placed pixel costs 1 point from your stock.
       </div>
       <div class="canvas-actions">
-        <button id="download-canvas" class="btn-download">⬇ Download PNG</button>
+        <button id="download-png" class="btn-download">⬇ PNG</button>
+        <button id="download-jpg" class="btn-download">⬇ JPG</button>
         <button id="clear-canvas">Clear</button>
       </div>
     </div>
@@ -350,9 +351,8 @@
     updatePixelsDisplay(); drawCanvas();
   });
 
-  // ── Download PNG ───────────────────────────────────────
-  document.getElementById('download-canvas').addEventListener('click', () => {
-    // Export at true pixel resolution (1 grid cell = 1 pixel)
+  // ── Download PNG / JPG ─────────────────────────────────
+  function exportCanvas(format) {
     const exp  = document.createElement('canvas');
     exp.width  = gridSize;
     exp.height = gridSize;
@@ -363,12 +363,15 @@
     for (let y = 0; y < gridSize; y++)
       for (let x = 0; x < gridSize; x++)
         if (grid[y][x]) ectx.fillRect(x, y, 1, 1);
-
+    const mime    = format === 'jpg' ? 'image/jpeg' : 'image/png';
     const link    = document.createElement('a');
-    link.download = `normies-${gridSize}x${gridSize}.png`;
-    link.href     = exp.toDataURL('image/png');
+    link.download = `normies-${gridSize}x${gridSize}.${format}`;
+    link.href     = exp.toDataURL(mime, 0.95);
     link.click();
-  });
+  }
+
+  document.getElementById('download-png').addEventListener('click', () => exportCanvas('png'));
+  document.getElementById('download-jpg').addEventListener('click', () => exportCanvas('jpg'));
 </script>
 </body>
 </html>
