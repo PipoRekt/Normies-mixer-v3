@@ -353,20 +353,30 @@
 
   // ── Download PNG / JPG ─────────────────────────────────
   function exportCanvas(format) {
-    const exp  = document.createElement('canvas');
-    exp.width  = gridSize;
-    exp.height = gridSize;
-    const ectx = exp.getContext('2d');
-    ectx.fillStyle = '#fff';
-    ectx.fillRect(0, 0, gridSize, gridSize);
-    ectx.fillStyle = '#222';
+    // Export at high resolution: each cell = 20px → 40x40 = 800x800, 100x100 = 2000x2000
+    const CELL   = 20;
+    const size   = gridSize * CELL;
+    const exp    = document.createElement('canvas');
+    exp.width    = size;
+    exp.height   = size;
+    const ectx   = exp.getContext('2d');
+
+    // White background
+    ectx.fillStyle = '#ffffff';
+    ectx.fillRect(0, 0, size, size);
+
+    // Draw pixels — crisp, no anti-aliasing
+    ectx.imageSmoothingEnabled = false;
+    ectx.fillStyle = '#222222';
     for (let y = 0; y < gridSize; y++)
       for (let x = 0; x < gridSize; x++)
-        if (grid[y][x]) ectx.fillRect(x, y, 1, 1);
+        if (grid[y][x]) ectx.fillRect(x * CELL, y * CELL, CELL, CELL);
+
     const mime    = format === 'jpg' ? 'image/jpeg' : 'image/png';
+    const quality = format === 'jpg' ? 1.0 : undefined;
     const link    = document.createElement('a');
-    link.download = `normies-${gridSize}x${gridSize}.${format}`;
-    link.href     = exp.toDataURL(mime, 0.95);
+    link.download = `normies-${gridSize}x${gridSize}-hq.${format}`;
+    link.href     = exp.toDataURL(mime, quality);
     link.click();
   }
 
